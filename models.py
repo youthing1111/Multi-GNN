@@ -6,8 +6,8 @@ import logging
 
 class GINe(torch.nn.Module):
     def __init__(self, num_features, num_gnn_layers, n_classes=2, 
-                n_hidden=100, edge_updates=False, residual=True, 
-                edge_dim=None, dropout=0.0, final_dropout=0.5):
+                n_hidden=100, edge_updates=False, residual=True, #n_hidden=100
+                edge_dim=None, dropout=0.0, final_dropout=0.5): #dropout=0.0
         super().__init__()
         self.n_hidden = n_hidden
         self.num_gnn_layers = num_gnn_layers
