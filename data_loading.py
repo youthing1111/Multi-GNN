@@ -4,6 +4,7 @@ import torch
 import logging
 import itertools
 from data_util import GraphData, HeteroData, z_norm, create_hetero_obj
+import networkx as nx
 
 def get_data_filter(df_edges):
 
@@ -197,8 +198,6 @@ def get_data(args, data_config):
     #Creating the final data objects
     tr_x, val_x, te_x = x, x, x
     e_tr = tr_inds.numpy()
-    print(tr_inds)
-    print(e_tr)
     e_val = np.concatenate([tr_inds, val_inds])
 
     tr_edge_index,  tr_edge_attr,  tr_y,  tr_edge_times  = edge_index[:,e_tr],  edge_attr[e_tr],  y[e_tr],  timestamps[e_tr]
@@ -208,6 +207,15 @@ def get_data(args, data_config):
     tr_data = GraphData (x=tr_x,  y=tr_y,  edge_index=tr_edge_index,  edge_attr=tr_edge_attr,  timestamps=tr_edge_times )
     val_data = GraphData(x=val_x, y=val_y, edge_index=val_edge_index, edge_attr=val_edge_attr, timestamps=val_edge_times)
     te_data = GraphData (x=te_x,  y=te_y,  edge_index=te_edge_index,  edge_attr=te_edge_attr,  timestamps=te_edge_times )
+
+    G=nx.MultiDiGraph()
+    G.add_edges_from(list(zip(df_edges.from_id, df_edges.to_id)))
+    G.add_nodes_from(np.arange(max_n_id))
+
+    indence_matrix = np.array(nx.incidence_matrix(G,oriented=True).toarray())
+    print(indence_matrix)
+
+    
 
     #Adding ports and time-deltas if applicable
     if args.ports:
