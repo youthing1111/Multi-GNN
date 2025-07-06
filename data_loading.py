@@ -208,12 +208,11 @@ def get_data(args, data_config):
     val_data = GraphData(x=val_x, y=val_y, edge_index=val_edge_index, edge_attr=val_edge_attr, timestamps=val_edge_times)
     te_data = GraphData (x=te_x,  y=te_y,  edge_index=te_edge_index,  edge_attr=te_edge_attr,  timestamps=te_edge_times )
 
-    G=nx.MultiDiGraph()
-    G.add_edges_from(list(zip(df_edges.from_id, df_edges.to_id)))
-    G.add_nodes_from(np.arange(max_n_id))
-
-    indence_matrix = np.array(nx.incidence_matrix(G,oriented=True).toarray())
-    print(indence_matrix)
+    #G=nx.MultiDiGraph()
+    #G.add_edges_from(list(zip(df_edges.from_id, df_edges.to_id)))
+    #G.add_nodes_from(np.arange(max_n_id))
+    #indence_matrix = np.array(nx.incidence_matrix(G,oriented=True).toarray())
+    #print(indence_matrix)
 
     
 

@@ -75,11 +75,9 @@ def train_homo(tr_loader, val_loader, te_loader, tr_inds, val_inds, te_inds, mod
             if args.save_model:
                 save_model(model, optimizer, epoch, args, data_config)
                 
-        if epoch <= 20:
+        if epoch < 20:
             confidence = pred_prob
             pred_diff = ground_truth-pred
-            #print(f'Number of incorrect pred: {len(list(np.where(pred_diff!=0)[0]))}')
-            #print(f'Number of correct pred: {len(list(np.where(pred_diff==0)[0]))}')
             wrong_pred = list(list(np.where(pred_diff!=0))[0])
             corret_pred = list(list(np.where(pred_diff==0))[0])
             threshold = np.percentile(np.array([confidence[i] for i in corret_pred]), 99)
@@ -88,10 +86,7 @@ def train_homo(tr_loader, val_loader, te_loader, tr_inds, val_inds, te_inds, mod
             confidence_above_thr = [i for i in corret_pred if confidence[i]>threshold]
             confidence_below_thr = [i for i in corret_pred if confidence[i]<=threshold]
             confidence_above_thr_sample = random.sample(confidence_above_thr, k=round(len(confidence_above_thr) * 0.1))
-            print(f'Confidence correct guess: {len(confidence_above_thr)}')
             ground_truth_list = list(ground_truth)
-            print(f'Number of 1: {ground_truth_list.count(1)}')
-            print(f'Number of 0: {ground_truth_list.count(0)}')
             sample = wrong_pred + confidence_above_thr_sample + confidence_below_thr
             df_edges = pd.read_csv('/user/HS401/ht00865/Downloads/HI_Small/formatted_transactions.csv')
             df_edges['Timestamp'] = df_edges['Timestamp'] - df_edges['Timestamp'].min()
@@ -151,25 +146,25 @@ def train_homo_original(tr_loader, val_loader, te_loader, tr_inds, val_inds, te_
 
         f1 = f1_score(ground_truth, pred)
 
-        #wandb.log({"f1/train": f1}, step=epoch)
+        wandb.log({"f1/train": f1}, step=epoch)
         logging.info(f'Train F1: {f1:.4f}')
 
         #evaluate
         val_f1 = evaluate_homo(val_loader, val_inds, model, val_data, device, args)
         te_f1 = evaluate_homo(te_loader, te_inds, model, te_data, device, args)
 
-        #wandb.log({"f1/validation": val_f1}, step=epoch)
-        #wandb.log({"f1/test": te_f1}, step=epoch)
+        wandb.log({"f1/validation": val_f1}, step=epoch)
+        wandb.log({"f1/test": te_f1}, step=epoch)
         logging.info(f'Validation F1: {val_f1:.4f}')
         logging.info(f'Test F1: {te_f1:.4f}')
 
-        #if epoch == 0:
-        #    wandb.log({"best_test_f1": te_f1}, step=epoch)
-        #elif val_f1 > best_val_f1:
-        #    best_val_f1 = val_f1
-        #    wandb.log({"best_test_f1": te_f1}, step=epoch)
-        #    if args.save_model:
-        #        save_model(model, optimizer, epoch, args, data_config)
+        if epoch == 0:
+            wandb.log({"best_test_f1": te_f1}, step=epoch)
+        elif val_f1 > best_val_f1:
+            best_val_f1 = val_f1
+            wandb.log({"best_test_f1": te_f1}, step=epoch)
+            if args.save_model:
+                save_model(model, optimizer, epoch, args, data_config)
     
     return model
 
